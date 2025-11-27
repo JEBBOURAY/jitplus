@@ -10,8 +10,11 @@ import java.util.Optional;
 @Service
 public class LoyaltyCardService {
 
-    @Autowired
-    private LoyaltyCardRepository repository;
+    private final LoyaltyCardRepository repository;
+
+    public LoyaltyCardService(LoyaltyCardRepository repository) {
+        this.repository = repository;
+    }
 
     public LoyaltyCard createCardIfNotExists(String merchantId, Long customerId) {
         Optional<LoyaltyCard> existing = repository.findByMerchantIdAndCustomerId(merchantId, customerId);

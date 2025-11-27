@@ -10,8 +10,11 @@ import java.util.Optional;
 @Service
 public class LoyaltyProgramService {
 
-    @Autowired
-    private LoyaltyProgramRepository repository;
+    private final LoyaltyProgramRepository repository;
+
+    public LoyaltyProgramService(LoyaltyProgramRepository repository) {
+        this.repository = repository;
+    }
 
     public LoyaltyProgram createOrUpdateProgram(LoyaltyProgram program) {
         Optional<LoyaltyProgram> existing = repository.findByMerchantId(program.getMerchantId());

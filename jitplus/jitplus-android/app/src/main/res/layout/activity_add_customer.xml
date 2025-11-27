@@ -44,6 +44,14 @@
         android:text="J'accepte que mes données soient utilisées pour le programme de fidélité"
         android:layout_marginBottom="24dp"/>
 
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="16dp"
+        android:visibility="gone" />
+
     <Button
         android:id="@+id/btn_create_customer"
         android:layout_width="match_parent"

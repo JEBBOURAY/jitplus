@@ -77,6 +77,14 @@
             android:hint="Récompense (ex: 1 café offert)"
             android:layout_marginBottom="24dp"/>
 
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone" />
+
         <Button
             android:id="@+id/btn_save_program"
             android:layout_width="match_parent"

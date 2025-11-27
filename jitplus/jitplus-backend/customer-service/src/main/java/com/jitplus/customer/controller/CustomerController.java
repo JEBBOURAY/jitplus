@@ -2,18 +2,21 @@ package com.jitplus.customer.controller;
 
 import com.jitplus.customer.model.Customer;
 import com.jitplus.customer.service.CustomerService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/customers")
 public class CustomerController {
 
-    @Autowired
-    private CustomerService service;
+    private final CustomerService service;
+
+    public CustomerController(CustomerService service) {
+        this.service = service;
+    }
 
     @PostMapping
-    public Customer registerCustomer(@RequestBody Customer customer) {
+    public Customer registerCustomer(@Valid @RequestBody Customer customer) {
         return service.registerCustomer(customer);
     }
 

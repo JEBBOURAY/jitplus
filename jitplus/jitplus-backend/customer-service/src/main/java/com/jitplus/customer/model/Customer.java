@@ -1,6 +1,8 @@
 package com.jitplus.customer.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "customers")
@@ -11,10 +13,14 @@ public class Customer {
     private Long id;
 
     @Column(nullable = false, unique = true)
+    @NotBlank(message = "Phone number is required")
     private String phoneNumber;
 
     private String name;
+    
+    @Email(message = "Email should be valid")
     private String email;
+    
     private boolean consent;
 
     public Customer() {

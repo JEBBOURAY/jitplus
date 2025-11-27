@@ -20,7 +20,16 @@
         android:layout_height="wrap_content"
         android:hint="Numéro de téléphone"
         android:inputType="phone"
+        android:maxLines="1"
+        android:imeOptions="actionSearch"
         android:layout_marginBottom="24dp"/>
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:visibility="gone" />
 
     <Button
         android:id="@+id/btn_perform_search"

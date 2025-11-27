@@ -13,8 +13,11 @@ import java.util.Optional;
 @Component
 public class CustomUserDetailsService implements UserDetailsService {
 
-    @Autowired
-    private MerchantRepository repository;
+    private final MerchantRepository repository;
+
+    public CustomUserDetailsService(MerchantRepository repository) {
+        this.repository = repository;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

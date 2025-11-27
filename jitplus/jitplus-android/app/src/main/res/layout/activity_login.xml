@@ -10,14 +10,26 @@
         android:id="@+id/username"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Email / Phone" />
+        android:hint="Email / Phone"
+        android:inputType="textEmailAddress"
+        android:maxLines="1"
+        android:imeOptions="actionNext" />
 
     <EditText
         android:id="@+id/password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Password"
-        android:inputType="textPassword" />
+        android:inputType="textPassword"
+        android:maxLines="1"
+        android:imeOptions="actionDone" />
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:visibility="gone" />
 
     <Button
         android:id="@+id/login_button"

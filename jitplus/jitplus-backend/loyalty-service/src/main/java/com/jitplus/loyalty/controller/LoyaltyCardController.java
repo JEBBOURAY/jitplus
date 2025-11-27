@@ -11,8 +11,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/loyalty/cards")
 public class LoyaltyCardController {
 
-    @Autowired
-    private LoyaltyCardService cardService;
+    private final LoyaltyCardService cardService;
+
+    public LoyaltyCardController(LoyaltyCardService cardService) {
+        this.cardService = cardService;
+    }
 
     @PostMapping
     public LoyaltyCard createCard(@RequestParam String merchantId, @RequestParam Long customerId) {

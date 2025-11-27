@@ -19,14 +19,17 @@ import java.time.LocalDateTime;
 @Service
 public class LoyaltyService {
 
-    @Autowired
-    private LoyaltyProgramRepository programRepository;
+    private final LoyaltyProgramRepository programRepository;
+    private final LoyaltyCardRepository cardRepository;
+    private final VisitRepository visitRepository;
 
-    @Autowired
-    private LoyaltyCardRepository cardRepository;
-
-    @Autowired
-    private VisitRepository visitRepository;
+    public LoyaltyService(LoyaltyProgramRepository programRepository,
+                         LoyaltyCardRepository cardRepository,
+                         VisitRepository visitRepository) {
+        this.programRepository = programRepository;
+        this.cardRepository = cardRepository;
+        this.visitRepository = visitRepository;
+    }
 
     @Transactional
     public VisitResponse recordVisit(VisitRequest request) {
