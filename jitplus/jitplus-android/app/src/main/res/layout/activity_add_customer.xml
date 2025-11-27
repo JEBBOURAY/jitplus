@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ajouter un client"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="24dp"/>
+
+    <EditText
+        android:id="@+id/cust_phone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Numéro de téléphone (Obligatoire)"
+        android:inputType="phone"
+        android:layout_marginBottom="12dp"/>
+
+    <EditText
+        android:id="@+id/cust_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nom (Optionnel)"
+        android:inputType="textPersonName"
+        android:layout_marginBottom="12dp"/>
+
+    <EditText
+        android:id="@+id/cust_email"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Email (Optionnel)"
+        android:inputType="textEmailAddress"
+        android:layout_marginBottom="16dp"/>
+
+    <CheckBox
+        android:id="@+id/cb_consent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="J'accepte que mes données soient utilisées pour le programme de fidélité"
+        android:layout_marginBottom="24dp"/>
+
+    <Button
+        android:id="@+id/btn_create_customer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Inscrire le client"/>
+
+</LinearLayout>

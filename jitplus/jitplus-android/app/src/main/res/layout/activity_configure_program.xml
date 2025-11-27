@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Configurer le programme"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="24dp"/>
+
+        <EditText
+            android:id="@+id/prog_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nom du programme (ex: Café Fidélité)"
+            android:layout_marginBottom="16dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Type de programme"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"/>
+
+        <RadioGroup
+            android:id="@+id/rg_type"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+
+            <RadioButton
+                android:id="@+id/rb_stamps"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tampons"
+                android:checked="true"
+                android:layout_marginEnd="16dp"/>
+
+            <RadioButton
+                android:id="@+id/rb_points"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Points"/>
+        </RadioGroup>
+
+        <EditText
+            android:id="@+id/prog_value"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Tampons/Points par passage (ex: 1)"
+            android:inputType="number"
+            android:text="1"
+            android:layout_marginBottom="16dp"/>
+
+        <EditText
+            android:id="@+id/prog_threshold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Objectif pour récompense (ex: 10)"
+            android:inputType="number"
+            android:layout_marginBottom="16dp"/>
+
+        <EditText
+            android:id="@+id/prog_reward"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Récompense (ex: 1 café offert)"
+            android:layout_marginBottom="24dp"/>
+
+        <Button
+            android:id="@+id/btn_save_program"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Enregistrer le programme"/>
+
+    </LinearLayout>
+</ScrollView>

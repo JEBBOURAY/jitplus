@@ -1,0 +1,5 @@
+com\jitplus\customer\model\Customer.class
+com\jitplus\customer\controller\CustomerController.class
+com\jitplus\customer\repository\CustomerRepository.class
+com\jitplus\customer\CustomerApplication.class
+com\jitplus\customer\service\CustomerService.class
