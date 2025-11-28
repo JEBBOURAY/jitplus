@@ -1,6 +1,13 @@
 package com.jitplus.loyalty.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -32,6 +39,16 @@ public class LoyaltyProgram {
     
     @NotBlank(message = "Reward description is required")
     private String rewardDescription;
+
+    // Happy Hour Configuration
+    private boolean happyHourEnabled = false;
+    private String happyHourStart; // Format "HH:mm"
+    private String happyHourEnd;   // Format "HH:mm"
+    private double happyHourMultiplier = 1.0;
+
+    // Progressive Configuration
+    private int progressiveStep = 5; // Increase points every X visits
+    private int progressiveBonus = 1; // Points to add per step
 
     public LoyaltyProgram() {
     }
@@ -99,5 +116,53 @@ public class LoyaltyProgram {
 
     public void setRewardDescription(String rewardDescription) {
         this.rewardDescription = rewardDescription;
+    }
+
+    public boolean isHappyHourEnabled() {
+        return happyHourEnabled;
+    }
+
+    public void setHappyHourEnabled(boolean happyHourEnabled) {
+        this.happyHourEnabled = happyHourEnabled;
+    }
+
+    public String getHappyHourStart() {
+        return happyHourStart;
+    }
+
+    public void setHappyHourStart(String happyHourStart) {
+        this.happyHourStart = happyHourStart;
+    }
+
+    public String getHappyHourEnd() {
+        return happyHourEnd;
+    }
+
+    public void setHappyHourEnd(String happyHourEnd) {
+        this.happyHourEnd = happyHourEnd;
+    }
+
+    public double getHappyHourMultiplier() {
+        return happyHourMultiplier;
+    }
+
+    public void setHappyHourMultiplier(double happyHourMultiplier) {
+        this.happyHourMultiplier = happyHourMultiplier;
+    }
+
+    public int getProgressiveStep() {
+        return progressiveStep;
+    }
+
+    public void setProgressiveStep(int progressiveStep) {
+        this.progressiveStep = progressiveStep;
+    }
+
+    public int getProgressiveBonus() {
+        return progressiveBonus;
+    }
+
+    public void setProgressiveBonus(int progressiveBonus) {
+        this.progressiveBonus = progressiveBonus;
     }
 }

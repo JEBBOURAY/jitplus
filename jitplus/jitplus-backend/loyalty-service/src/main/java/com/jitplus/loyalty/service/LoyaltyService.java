@@ -1,6 +1,7 @@
 package com.jitplus.loyalty.service;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,11 +47,44 @@ public class LoyaltyService {
         int stampsToAdd = 0;
         int pointsToAdd = 0;
 
+        // Happy Hour Logic
+        double multiplier = 1.0;
+        if (program.isHappyHourEnabled() && program.getHappyHourStart() != null && program.getHappyHourEnd() != null) {
+            try {
+                LocalTime now = LocalTime.now();
+                LocalTime start = LocalTime.parse(program.getHappyHourStart());
+                LocalTime end = LocalTime.parse(program.getHappyHourEnd());
+                if (now.isAfter(start) && now.isBefore(end)) {
+                    multiplier = program.getHappyHourMultiplier();
+                }
+            } catch (Exception e) {
+                // Ignore parsing errors
+            }
+        }
+
         if (program.getType() == ProgramType.STAMPS) {
-            stampsToAdd = quantity * program.getPointsPerVisit();
+            stampsToAdd = (int) (quantity * program.getPointsPerVisit() * multiplier);
             card.setCurrentStamps(card.getCurrentStamps() + stampsToAdd);
-        } else {
-            pointsToAdd = quantity * program.getPointsPerVisit();
+        } else if (program.getType() == ProgramType.POINTS) {
+            pointsToAdd = (int) (quantity * program.getPointsPerVisit() * multiplier);
+            card.setCurrentPoints(card.getCurrentPoints() + pointsToAdd);
+        } else if (program.getType() == ProgramType.PROGRESSIVE) {
+            // Progressive Logic
+            int basePoints = (int) (quantity * program.getPointsPerVisit() * multiplier);
+            
+            int bonus = 0;
+            if (program.getProgressiveStep() > 0) {
+                // Calculate level based on total visits (including this one roughly, or previous)
+                // User example: 5th passage = 2 points.
+                // If step=5, bonus=1.
+                // Visit 0 (1st): 0/5 = 0 -> 1 pt
+                // Visit 4 (5th): 4/5 = 0? No, user said 5th passage.
+                // Let's use (totalVisits + 1) / step
+                int level = (card.getTotalVisits()) / program.getProgressiveStep(); 
+                bonus = level * program.getProgressiveBonus();
+            }
+            
+            pointsToAdd = basePoints + bonus;
             card.setCurrentPoints(card.getCurrentPoints() + pointsToAdd);
         }
         

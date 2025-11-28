@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp">
@@ -29,29 +30,163 @@
             android:layout_height="wrap_content"
             android:text="Type de programme"
             android:textStyle="bold"
-            android:layout_marginBottom="8dp"/>
+            android:layout_marginBottom="12dp"/>
 
-        <RadioGroup
-            android:id="@+id/rg_type"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:baselineAligned="false"
+            android:layout_marginBottom="24dp">
+
+            <!-- Card Stamps -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_stamps"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                app:cardElevation="2dp"
+                app:cardCornerRadius="12dp"
+                app:strokeWidth="2dp"
+                app:strokeColor="@color/primary"
+                android:clickable="true"
+                android:focusable="true">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="12dp"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tampons"
+                        android:textStyle="bold"
+                        android:textColor="@color/primary"
+                        android:layout_marginBottom="4dp"/>
+                    
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Simple"
+                        android:textSize="12sp"
+                        android:textColor="@color/text_secondary"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Card Points -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_points"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                app:cardElevation="2dp"
+                app:cardCornerRadius="12dp"
+                app:strokeWidth="0dp"
+                app:strokeColor="@color/text_secondary"
+                android:clickable="true"
+                android:focusable="true">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="12dp"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Points"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary"
+                        android:layout_marginBottom="4dp"/>
+                    
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Flexible"
+                        android:textSize="12sp"
+                        android:textColor="@color/text_secondary"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Card Progressive -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_progressive"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                app:cardElevation="2dp"
+                app:cardCornerRadius="12dp"
+                app:strokeWidth="0dp"
+                app:strokeColor="@color/text_secondary"
+                android:clickable="true"
+                android:focusable="true">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="12dp"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Progressif"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary"
+                        android:layout_marginBottom="4dp"/>
+                    
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Fun"
+                        android:textSize="12sp"
+                        android:textColor="@color/text_secondary"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+        <!-- Progressive Settings -->
+        <LinearLayout
+            android:id="@+id/layout_progressive"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:background="#F5F5F5"
+            android:padding="8dp"
             android:layout_marginBottom="16dp">
-
-            <RadioButton
-                android:id="@+id/rb_stamps"
+            
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Tampons"
-                android:checked="true"
-                android:layout_marginEnd="16dp"/>
-
-            <RadioButton
-                android:id="@+id/rb_points"
-                android:layout_width="wrap_content"
+                android:text="Configuration Progressive"
+                android:textStyle="bold"/>
+                
+            <EditText
+                android:id="@+id/et_prog_step"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Points"/>
-        </RadioGroup>
+                android:hint="Augmenter tous les X passages (ex: 5)"
+                android:inputType="number"
+                android:text="5"/>
+                
+            <EditText
+                android:id="@+id/et_prog_bonus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Bonus de points (ex: 1)"
+                android:inputType="number"
+                android:text="1"/>
+        </LinearLayout>
 
         <EditText
             android:id="@+id/prog_value"
@@ -76,6 +211,55 @@
             android:layout_height="wrap_content"
             android:hint="Récompense (ex: 1 café offert)"
             android:layout_marginBottom="24dp"/>
+
+        <!-- Happy Hour Settings -->
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switch_happy_hour"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Activer Happy Hour"
+            android:layout_marginBottom="8dp"/>
+
+        <LinearLayout
+            android:id="@+id/layout_happy_hour"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:background="#F0F8FF"
+            android:padding="8dp"
+            android:layout_marginBottom="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                
+                <EditText
+                    android:id="@+id/et_hh_start"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="Début (HH:mm)"
+                    android:inputType="time"/>
+                    
+                <EditText
+                    android:id="@+id/et_hh_end"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="Fin (HH:mm)"
+                    android:inputType="time"/>
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/et_hh_multiplier"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Multiplicateur (ex: 2.0)"
+                android:inputType="numberDecimal"
+                android:text="2.0"/>
+        </LinearLayout>
 
         <ProgressBar
             android:id="@+id/progress_bar"

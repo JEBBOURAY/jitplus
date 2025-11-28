@@ -1,75 +1,167 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp"
-    android:gravity="center_horizontal">
+    android:fillViewport="true"
+    android:background="@color/background">
 
-    <TextView
-        android:id="@+id/tv_card_info"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Carte de Fidélité"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="24dp"/>
-
-    <TextView
-        android:id="@+id/tv_program_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Programme: Chargement..."
-        android:textSize="18sp"
-        android:layout_marginBottom="8dp"/>
-
-    <TextView
-        android:id="@+id/tv_progress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="0 / 10"
-        android:textSize="48sp"
-        android:textStyle="bold"
-        android:textColor="@color/purple_500"
-        android:layout_marginBottom="32dp"/>
-
-    <ProgressBar
-        android:id="@+id/progress_bar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:visibility="gone" />
-
-    <Button
-        android:id="@+id/btn_add_visit"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="+1 Passage"
-        android:layout_marginBottom="12dp"/>
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:gravity="center_horizontal">
 
-    <Button
-        android:id="@+id/btn_show_qr"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="📱 Afficher le QR Code"
-        style="?attr/materialButtonOutlinedStyle"
-        android:layout_marginBottom="16dp"/>
+        <!-- Header Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="32dp"
+            app:cardElevation="4dp"
+            app:cardCornerRadius="16dp"
+            app:cardBackgroundColor="@color/white">
 
-    <Button
-        android:id="@+id/btn_redeem_reward"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Utiliser la récompense"
-        android:backgroundTint="@color/teal_700"
-        android:visibility="gone"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="24dp"
+                android:gravity="center">
 
-    <TextView
-        android:id="@+id/tv_reward_status"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:textSize="16sp"
-        android:textColor="@color/teal_700"
-        android:layout_marginTop="16dp"/>
+                <TextView
+                    android:id="@+id/tv_program_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Programme"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary"
+                    android:layout_marginBottom="8dp"/>
 
-</LinearLayout>
+                <TextView
+                    android:id="@+id/tv_card_info"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Carte de Fidélité"
+                    android:textSize="14sp"
+                    android:textColor="@color/text_secondary"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Stamps Grid Container -->
+        <GridLayout
+            android:id="@+id/grid_stamps"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:columnCount="5"
+            android:rowCount="2"
+            android:alignmentMode="alignMargins"
+            android:useDefaultMargins="true"
+            android:layout_marginBottom="32dp"
+            android:visibility="gone"/>
+
+        <!-- Points Progress Container -->
+        <RelativeLayout
+            android:id="@+id/layout_points"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_marginBottom="32dp"
+            android:visibility="gone">
+
+            <ProgressBar
+                android:id="@+id/progress_points"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:progressDrawable="@drawable/circular_progress"
+                android:indeterminate="false"
+                android:max="100"
+                android:progress="0"
+                android:rotation="-90"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_centerInParent="true"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/tv_points_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textSize="48sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/primary"/>
+
+                <TextView
+                    android:id="@+id/tv_points_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Points"
+                    android:textSize="14sp"
+                    android:textColor="@color/text_secondary"/>
+            </LinearLayout>
+        </RelativeLayout>
+        
+        <!-- Fallback Text Progress (Hidden by default) -->
+        <TextView
+            android:id="@+id/tv_progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0 / 10"
+            android:textSize="24sp"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/tv_reward_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/teal_700"
+            android:layout_marginBottom="24dp"
+            android:gravity="center"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_add_visit"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="+ Ajouter un passage"
+            android:textSize="16sp"
+            app:cornerRadius="30dp"
+            android:layout_marginBottom="16dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_redeem_reward"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="🎁 Utiliser la récompense"
+            android:textSize="16sp"
+            app:cornerRadius="30dp"
+            android:backgroundTint="@color/teal_700"
+            android:visibility="gone"
+            android:layout_marginBottom="16dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_show_qr"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Afficher le QR Code"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            app:strokeColor="@color/primary"
+            android:textColor="@color/primary"
+            app:cornerRadius="30dp"/>
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:visibility="gone" />
+
+    </LinearLayout>
+</ScrollView>

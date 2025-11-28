@@ -2,10 +2,13 @@ package com.jitplus.merchant.ui.loyalty
 
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.jitplus.merchant.R
 import com.jitplus.merchant.data.model.LoyaltyCard
 import com.jitplus.merchant.data.model.LoyaltyProgram
@@ -123,9 +126,40 @@ class LoyaltyCardActivity : AppCompatActivity() {
             val threshold = currentProgram!!.threshold
 
             if (isStamps) {
-                binding.tvProgress.text = getString(R.string.progress_stamps, current, threshold)
+                // Show Stamps Grid
+                binding.gridStamps.visibility = View.VISIBLE
+                binding.layoutPoints.visibility = View.GONE
+                
+                binding.gridStamps.removeAllViews()
+                binding.gridStamps.columnCount = 5
+                
+                val sizePx = (48 * resources.displayMetrics.density).toInt()
+                val marginPx = (4 * resources.displayMetrics.density).toInt()
+
+                for (i in 1..threshold) {
+                    val stampView = ImageView(this)
+                    val params = LinearLayout.LayoutParams(sizePx, sizePx)
+                    params.setMargins(marginPx, marginPx, marginPx, marginPx)
+                    stampView.layoutParams = params
+                    
+                    if (i <= current) {
+                        stampView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_stamp_filled))
+                    } else {
+                        stampView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_stamp_empty))
+                    }
+                    
+                    binding.gridStamps.addView(stampView)
+                }
+                
             } else {
-                binding.tvProgress.text = getString(R.string.progress_points, current, threshold)
+                // Show Points Progress
+                binding.gridStamps.visibility = View.GONE
+                binding.layoutPoints.visibility = View.VISIBLE
+                
+                binding.progressPoints.max = threshold
+                binding.progressPoints.progress = current
+                binding.tvPointsValue.text = current.toString()
+                binding.tvPointsLabel.text = "/ $threshold Points"
             }
 
             if (current >= threshold) {
