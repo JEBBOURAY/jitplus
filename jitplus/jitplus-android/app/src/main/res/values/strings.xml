@@ -1,3 +1,99 @@
 <resources>
-    <string name="app_name">JitPlus</string>
+    <string name="app_name">Jit+</string>
+    <string name="app_slogan">Khlli l\'clients yerja3ou... kol nhar.</string>
+    
+    <!-- Error Messages -->
+    <string name="error_bad_request">Requête invalide. Vérifiez les données saisies</string>
+    <string name="error_unauthorized">Email ou mot de passe incorrect</string>
+    <string name="error_forbidden">Accès interdit</string>
+    <string name="error_not_found">Service non disponible</string>
+    <string name="error_timeout">Délai d\'attente dépassé</string>
+    <string name="error_conflict">Conflit - Ces données existent déjà</string>
+    <string name="error_unprocessable">Données invalides</string>
+    <string name="error_too_many_requests">Trop de tentatives. Réessayez plus tard</string>
+    <string name="error_server">Erreur serveur. Réessayez plus tard</string>
+    <string name="error_connection_code">Erreur de connexion (code: %1$d)</string>
+    
+    <!-- Network Errors -->
+    <string name="net_error_connect">Impossible de se connecter au serveur. Vérifiez que le backend est démarré</string>
+    <string name="net_error_timeout">Délai d\'attente dépassé. Vérifiez votre connexion</string>
+    <string name="net_error_unknown_host">Serveur introuvable. Vérifiez votre connexion Internet</string>
+    <string name="net_error_ssl">Erreur de sécurité SSL</string>
+    <string name="net_error_generic">Erreur réseau: %1$s</string>
+    
+    <!-- Dashboard -->
+    <string name="session_expired">Session expirée. Reconnectez-vous</string>
+    <string name="visits_count">%1$d visites</string>
+    <string name="redemptions_count">%1$d cadeaux</string>
+    
+    <!-- Home -->
+    <string name="default_merchant_name">Commerçant</string>
+
+    <!-- Login & Register -->
+    <string name="fill_all_fields">Veuillez remplir tous les champs</string>
+    <string name="invalid_email_phone">Format email ou téléphone invalide</string>
+    <string name="login_success">Connexion réussie</string>
+    <string name="invalid_token">Token invalide reçu du serveur</string>
+    <string name="fill_required_fields">Veuillez remplir tous les champs obligatoires (email, mot de passe, nom de boutique)</string>
+    <string name="invalid_email">Format email invalide</string>
+    <string name="shop_name_too_short">Le nom de la boutique doit contenir au moins 2 caractères</string>
+    <string name="register_success">Inscription réussie ! Vous pouvez vous connecter</string>
+
+    <!-- Loyalty Card -->
+    <string name="error_missing_customer_data">Erreur: données client manquantes</string>
+    <string name="program_label">Programme: %1$s</string>
+    <string name="progress_stamps">%1$d / %2$d Tampons</string>
+    <string name="progress_points">%1$d / %2$d Points</string>
+    <string name="reward_available">Récompense disponible : %1$s</string>
+    <string name="visit_added_success">+1 Ajouté avec succès !</string>
+    <string name="reward_redeemed_title">✅ Récompense utilisée</string>
+    <string name="reward_redeemed_message">La récompense a été validée avec succès. Le solde a été remis à zéro.</string>
+    <string name="phone_unavailable">Numéro de téléphone non disponible</string>
+    <string name="congrats_title">🎉 Félicitations !</string>
+    <string name="reward_unlocked_message">Le client a débloqué sa récompense : %1$s</string>
+
+    <!-- Configure Program -->
+    <string name="positive_value_error">Les %1$s par passage doivent être un nombre positif</string>
+    <string name="positive_threshold_error">L\'objectif doit être un nombre positif</string>
+    <string name="threshold_error">L\'objectif doit être supérieur aux %1$s par passage</string>
+    <string name="program_saved_success">Programme enregistré avec succès !</string>
+    <string name="stamps">tampons</string>
+    <string name="points">points</string>
+
+    <!-- Add Customer -->
+    <string name="phone_required">Numéro de téléphone obligatoire</string>
+    <string name="invalid_phone_format">Format de téléphone invalide. Utilisez le format français (ex: 0612345678)</string>
+    <string name="consent_required">Le consentement est obligatoire pour créer une carte de fidélité</string>
+    <string name="customer_created_success">Client inscrit avec succès !</string>
+
+    <!-- QR Code -->
+    <string name="phone_label">Numéro: %1$s</string>
+    <string name="error_missing_phone">Erreur: numéro de téléphone manquant</string>
+    <string name="invalid_qr_token">Token QR invalide</string>
+    <string name="qr_generation_error">Erreur lors de la génération du QR code</string>
+    <string name="qr_unavailable">QR code non disponible</string>
+    <string name="share_qr_title">Partager le QR Code</string>
+    <string name="share_qr_subject">QR Code Fidélité</string>
+    <string name="share_qr_text">Voici votre QR code de fidélité. Présentez-le lors de vos visites pour gagner des points !</string>
+    <string name="qr_fetch_error">Impossible de récupérer le QR code: %1$s</string>
+    <string name="share_error">Erreur lors du partage</string>
+
+    <!-- Customer Search -->
+    <string name="customer_not_found_title">Client introuvable</string>
+    <string name="customer_not_found_message">Ce numéro n\'est pas encore enregistré dans le système. Souhaitez-vous créer un nouveau client ?</string>
+    <string name="create">Créer</string>
+    <string name="cancel">Annuler</string>
+    <string name="scan_qr_prompt">Scanner le QR Code du client</string>
+    <string name="camera_permission_required">Permission caméra nécessaire pour scanner les QR codes</string>
+    <string name="scan_cancelled">Scan annulé</string>
+
+    <!-- Settings -->
+    <string name="notifications_enabled">Notifications activées</string>
+    <string name="notifications_disabled">Notifications désactivées</string>
+    <string name="logout_success">Déconnexion réussie</string>
+    <string name="store_name_required">Le nom du commerce est requis</string>
+    <string name="info_saved">Informations enregistrées</string>
+    
+    <!-- Common -->
+    <string name="ok">OK</string>
 </resources>

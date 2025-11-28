@@ -1,11 +1,11 @@
 package com.jitplus.customer.service;
 
-import com.jitplus.customer.model.Customer;
-import com.jitplus.customer.repository.CustomerRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import com.jitplus.customer.model.Customer;
+import com.jitplus.customer.repository.CustomerRepository;
 
 @Service
 public class CustomerService {
@@ -26,5 +26,13 @@ public class CustomerService {
 
     public Optional<Customer> getCustomerByPhone(String phone) {
         return repository.findByPhoneNumber(phone);
+    }
+    
+    public Optional<Customer> getCustomerByQrToken(String qrToken) {
+        return repository.findByQrToken(qrToken);
+    }
+    
+    public Optional<Customer> getCustomerById(Long id) {
+        return repository.findById(id);
     }
 }

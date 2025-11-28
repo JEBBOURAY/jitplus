@@ -1,173 +1,171 @@
 package com.jitplus.merchant.ui.customer
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import com.journeyapps.barcodescanner.ScanContract
+import com.journeyapps.barcodescanner.ScanOptions
 import com.jitplus.merchant.R
-import com.jitplus.merchant.api.ApiClient
-import com.jitplus.merchant.api.services.CustomerService
-import com.jitplus.merchant.api.services.LoyaltyService
-import com.jitplus.merchant.data.model.Customer
-import com.jitplus.merchant.data.model.LoyaltyCard
+import com.jitplus.merchant.databinding.ActivityCustomerSearchBinding
 import com.jitplus.merchant.ui.loyalty.LoyaltyCardActivity
-import com.jitplus.merchant.utils.ErrorHandler
 import com.jitplus.merchant.utils.TokenManager
-import com.jitplus.merchant.utils.ValidationUtils
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class CustomerSearchActivity : AppCompatActivity() {
     
-    private lateinit var phoneInput: EditText
-    private lateinit var searchButton: Button
-    private lateinit var progressBar: ProgressBar
-    private var searchCall: Call<Customer>? = null
-    private var cardCall: Call<LoyaltyCard>? = null
+    private lateinit var binding: ActivityCustomerSearchBinding
+    private val viewModel: CustomerSearchViewModel by viewModels()
     
+    companion object {
+        private const val CAMERA_PERMISSION_REQUEST = 100
+    }
+    
+    private var merchantId: String? = null
+    
+    private val scanLauncher = registerForActivityResult(ScanContract()) { result ->
+        if (result.contents != null) {
+            viewModel.searchByQrToken(result.contents)
+        } else {
+            showError(getString(R.string.scan_cancelled))
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_customer_search)
+        binding = ActivityCustomerSearchBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        phoneInput = findViewById(R.id.search_phone)
-        searchButton = findViewById(R.id.btn_perform_search)
-        progressBar = findViewById(R.id.progress_bar)
-
+        initializeServices()
+        setupListeners()
+        setupObservers()
+    }
+    
+    private fun initializeServices() {
         val tokenManager = TokenManager(this)
-        val merchantId = tokenManager.getUsername()
+        merchantId = tokenManager.getUsername()
 
         if (merchantId == null) {
-            Toast.makeText(this, "Session expirée. Reconnectez-vous", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.session_expired), Toast.LENGTH_SHORT).show()
             finish()
             return
         }
+    }
+    
+    private fun setupListeners() {
+        binding.btnPerformSearch.setOnClickListener { 
+            val phone = binding.searchPhone.text.toString().trim()
+            viewModel.searchByPhone(phone)
+        }
+        binding.btnScanQr.setOnClickListener { checkCameraPermissionAndScan() }
+    }
 
-        val customerService = ApiClient.getClient(this).create(CustomerService::class.java)
-        val loyaltyService = ApiClient.getClient(this).create(LoyaltyService::class.java)
+    private fun setupObservers() {
+        viewModel.isLoading.observe(this) { isLoading ->
+            showLoading(isLoading)
+        }
 
-        searchButton.setOnClickListener {
-            performSearch(customerService, loyaltyService, merchantId)
+        viewModel.errorMessage.observe(this) { errorMsg ->
+            showError(errorMsg)
+        }
+
+        viewModel.customer.observe(this) { customer ->
+            binding.searchPhone.setText(customer.phoneNumber)
+            // Automatically check/create loyalty card when customer is found
+            viewModel.checkLoyaltyCard(merchantId!!, customer.id!!, customer.name, customer.phoneNumber)
+        }
+
+        viewModel.loyaltyCard.observe(this) { card ->
+            navigateToLoyaltyCard(card.customerId, binding.searchPhone.text.toString())
+        }
+
+        viewModel.notFound.observe(this) { phone ->
+            showNotFoundDialog(phone)
         }
     }
     
-    private fun performSearch(customerService: CustomerService, loyaltyService: LoyaltyService, merchantId: String) {
-        val phone = phoneInput.text.toString().trim()
-        
-        if (phone.isEmpty()) {
-            showError("Veuillez entrer un numéro de téléphone")
-            return
+    private fun navigateToLoyaltyCard(customerId: Long, phoneNumber: String) {
+        val intent = Intent(this, LoyaltyCardActivity::class.java).apply {
+            putExtra("CUSTOMER_ID", customerId)
+            putExtra("MERCHANT_ID", merchantId)
+            putExtra("PHONE_NUMBER", phoneNumber)
         }
-
-        if (!ValidationUtils.isValidPhoneNumber(phone)) {
-            showError("Format de téléphone invalide. Utilisez le format français (ex: 0612345678)")
-            return
-        }
-
-        showLoading(true)
-
-        searchCall = customerService.getCustomerByPhone(phone)
-        searchCall?.enqueue(object : Callback<Customer> {
-            override fun onResponse(call: Call<Customer>, response: Response<Customer>) {
-                if (isDestroyed || isFinishing) return
-                
-                when {
-                    response.isSuccessful && response.body() != null -> {
-                        val customer = response.body()!!
-                        checkLoyaltyCard(loyaltyService, merchantId, customer.id!!)
-                    }
-                    response.code() == 404 -> {
-                        showLoading(false)
-                        showNotFoundDialog(phone)
-                    }
-                    else -> {
-                        showLoading(false)
-                        val errorMsg = ErrorHandler.getHttpErrorMessage(response.code())
-                        ErrorHandler.logError("CustomerSearchActivity", "Search failed: ${response.code()}")
-                        showError(errorMsg)
-                    }
-                }
-            }
-
-            override fun onFailure(call: Call<Customer>, t: Throwable) {
-                if (isDestroyed || isFinishing) return
-                
-                showLoading(false)
-                val errorMsg = ErrorHandler.getNetworkErrorMessage(t)
-                ErrorHandler.logError("CustomerSearchActivity", "Network error", t)
-                showError(errorMsg)
-            }
-        })
-    }
-
-    private fun checkLoyaltyCard(loyaltyService: LoyaltyService, merchantId: String, customerId: Long) {
-        cardCall = loyaltyService.createCard(merchantId, customerId)
-        cardCall?.enqueue(object : Callback<LoyaltyCard> {
-            override fun onResponse(call: Call<LoyaltyCard>, response: Response<LoyaltyCard>) {
-                if (isDestroyed || isFinishing) return
-                
-                showLoading(false)
-                
-                when {
-                    response.isSuccessful -> {
-                        val intent = Intent(this@CustomerSearchActivity, LoyaltyCardActivity::class.java)
-                        intent.putExtra("CUSTOMER_ID", customerId)
-                        intent.putExtra("MERCHANT_ID", merchantId)
-                        startActivity(intent)
-                        finish()
-                    }
-                    else -> {
-                        val errorMsg = ErrorHandler.getHttpErrorMessage(response.code())
-                        ErrorHandler.logError("CustomerSearchActivity", "Card retrieval failed: ${response.code()}")
-                        showError("Erreur récupération carte: $errorMsg")
-                    }
-                }
-            }
-
-            override fun onFailure(call: Call<LoyaltyCard>, t: Throwable) {
-                if (isDestroyed || isFinishing) return
-                
-                showLoading(false)
-                val errorMsg = ErrorHandler.getNetworkErrorMessage(t)
-                ErrorHandler.logError("CustomerSearchActivity", "Network error on card", t)
-                showError(errorMsg)
-            }
-        })
+        startActivity(intent)
+        finish()
     }
 
     private fun showNotFoundDialog(phone: String) {
-        if (isDestroyed || isFinishing) return
-        
         AlertDialog.Builder(this)
-            .setTitle("Client introuvable")
-            .setMessage("Ce numéro n'est pas encore enregistré dans le système. Souhaitez-vous créer un nouveau client ?")
-            .setPositiveButton("Créer") { _, _ ->
+            .setTitle(getString(R.string.customer_not_found_title))
+            .setMessage(getString(R.string.customer_not_found_message))
+            .setPositiveButton(getString(R.string.create)) { _, _ ->
                 val intent = Intent(this, AddCustomerActivity::class.java)
+                intent.putExtra("PHONE_NUMBER", phone)
                 startActivity(intent)
                 finish()
             }
-            .setNegativeButton("Annuler", null)
+            .setNegativeButton(getString(R.string.cancel), null)
             .show()
     }
     
+    private fun checkCameraPermissionAndScan() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) 
+            == PackageManager.PERMISSION_GRANTED) {
+            startQRCodeScan()
+        } else {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.CAMERA),
+                CAMERA_PERMISSION_REQUEST
+            )
+        }
+    }
+    
+    private fun startQRCodeScan() {
+        val options = ScanOptions()
+        options.setDesiredBarcodeFormats(ScanOptions.QR_CODE)
+        options.setPrompt(getString(R.string.scan_qr_prompt))
+        options.setCameraId(0)
+        options.setBeepEnabled(true)
+        options.setBarcodeImageEnabled(false)
+        options.setOrientationLocked(true)
+        scanLauncher.launch(options)
+    }
+    
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        
+        if (requestCode == CAMERA_PERMISSION_REQUEST) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                startQRCodeScan()
+            } else {
+                Toast.makeText(
+                    this,
+                    getString(R.string.camera_permission_required),
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+    }
+    
     private fun showLoading(show: Boolean) {
-        progressBar.visibility = if (show) View.VISIBLE else View.GONE
-        searchButton.isEnabled = !show
-        phoneInput.isEnabled = !show
+        binding.progressBar.visibility = if (show) View.VISIBLE else View.GONE
+        binding.btnPerformSearch.isEnabled = !show
+        binding.btnScanQr.isEnabled = !show
+        binding.searchPhone.isEnabled = !show
     }
     
     private fun showError(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
-    }
-    
-    override fun onDestroy() {
-        super.onDestroy()
-        searchCall?.cancel()
-        cardCall?.cancel()
     }
 }

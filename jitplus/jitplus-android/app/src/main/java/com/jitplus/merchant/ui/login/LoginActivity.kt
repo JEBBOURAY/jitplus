@@ -3,40 +3,25 @@ package com.jitplus.merchant.ui.login
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.jitplus.merchant.R
-import com.jitplus.merchant.api.ApiClient
-import com.jitplus.merchant.api.services.AuthService
 import com.jitplus.merchant.data.model.LoginRequest
+import com.jitplus.merchant.databinding.ActivityLoginBinding
 import com.jitplus.merchant.ui.home.HomeActivity
-import com.jitplus.merchant.utils.ErrorHandler
 import com.jitplus.merchant.utils.TokenManager
 import com.jitplus.merchant.utils.ValidationUtils
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class LoginActivity : AppCompatActivity() {
     
-    private lateinit var usernameInput: EditText
-    private lateinit var passwordInput: EditText
-    private lateinit var loginButton: Button
-    private lateinit var progressBar: ProgressBar
-    private var loginCall: Call<String>? = null
+    private lateinit var binding: ActivityLoginBinding
+    private val viewModel: AuthViewModel by viewModels()
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
-
-        usernameInput = findViewById(R.id.username)
-        passwordInput = findViewById(R.id.password)
-        loginButton = findViewById(R.id.login_button)
-        progressBar = findViewById(R.id.progress_bar)
-        val registerLink = findViewById<android.widget.TextView>(R.id.tv_register_link)
+        binding = ActivityLoginBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         // Check if already logged in
         val tokenManager = TokenManager(this)
@@ -46,29 +31,49 @@ class LoginActivity : AppCompatActivity() {
             return
         }
 
-        val authService = ApiClient.getClient(this).create(AuthService::class.java)
+        setupObservers()
 
-        registerLink.setOnClickListener {
+        binding.tvRegisterLink.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
         }
 
-        loginButton.setOnClickListener {
-            attemptLogin(authService, tokenManager)
+        binding.loginButton.setOnClickListener {
+            attemptLogin()
+        }
+    }
+
+    private fun setupObservers() {
+        viewModel.isLoading.observe(this) { isLoading ->
+            showLoading(isLoading)
+        }
+
+        viewModel.errorMessage.observe(this) { error ->
+            if (error != null) {
+                showError(error)
+            }
+        }
+
+        viewModel.loginSuccess.observe(this) { success ->
+            if (success) {
+                Toast.makeText(this, getString(R.string.login_success), Toast.LENGTH_SHORT).show()
+                startActivity(Intent(this, HomeActivity::class.java))
+                finish()
+            }
         }
     }
     
-    private fun attemptLogin(authService: AuthService, tokenManager: TokenManager) {
-        val username = usernameInput.text.toString().trim()
-        val password = passwordInput.text.toString()
+    private fun attemptLogin() {
+        val username = binding.username.text.toString().trim()
+        val password = binding.password.text.toString()
 
         // Validation
         if (username.isEmpty() || password.isEmpty()) {
-            showError("Veuillez remplir tous les champs")
+            showError(getString(R.string.fill_all_fields))
             return
         }
 
         if (!ValidationUtils.isValidEmail(username) && !ValidationUtils.isValidPhoneNumber(username)) {
-            showError("Format email ou téléphone invalide")
+            showError(getString(R.string.invalid_email_phone))
             return
         }
 
@@ -78,61 +83,18 @@ class LoginActivity : AppCompatActivity() {
             return
         }
 
-        showLoading(true)
         val request = LoginRequest(username, password)
-        
-        loginCall = authService.login(request)
-        loginCall?.enqueue(object : Callback<String> {
-            override fun onResponse(call: Call<String>, response: Response<String>) {
-                if (isDestroyed || isFinishing) return
-                
-                showLoading(false)
-                
-                when {
-                    response.isSuccessful -> {
-                        val token = response.body()
-                        if (token != null && token.isNotEmpty()) {
-                            tokenManager.saveToken(token)
-                            tokenManager.saveUsername(username)
-                            Toast.makeText(this@LoginActivity, "Connexion réussie", Toast.LENGTH_SHORT).show()
-                            startActivity(Intent(this@LoginActivity, HomeActivity::class.java))
-                            finish()
-                        } else {
-                            showError("Token invalide reçu du serveur")
-                        }
-                    }
-                    else -> {
-                        val errorMsg = ErrorHandler.getHttpErrorMessage(response.code())
-                        ErrorHandler.logError("LoginActivity", "Login failed: ${response.code()} - ${response.message()}")
-                        showError(errorMsg)
-                    }
-                }
-            }
-
-            override fun onFailure(call: Call<String>, t: Throwable) {
-                if (isDestroyed || isFinishing) return
-                
-                showLoading(false)
-                val errorMsg = ErrorHandler.getNetworkErrorMessage(t)
-                ErrorHandler.logError("LoginActivity", "Network error", t)
-                showError(errorMsg)
-            }
-        })
+        viewModel.login(request)
     }
     
     private fun showLoading(show: Boolean) {
-        progressBar.visibility = if (show) View.VISIBLE else View.GONE
-        loginButton.isEnabled = !show
-        usernameInput.isEnabled = !show
-        passwordInput.isEnabled = !show
+        binding.progressBar.visibility = if (show) View.VISIBLE else View.GONE
+        binding.loginButton.isEnabled = !show
+        binding.username.isEnabled = !show
+        binding.password.isEnabled = !show
     }
     
     private fun showError(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
-    }
-    
-    override fun onDestroy() {
-        super.onDestroy()
-        loginCall?.cancel()
     }
 }

@@ -1,6 +1,12 @@
 package com.jitplus.customer.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
@@ -22,6 +28,9 @@ public class Customer {
     private String email;
     
     private boolean consent;
+    
+    @Column(nullable = false, unique = true, updatable = false)
+    private String qrToken;
 
     public Customer() {
     }
@@ -31,6 +40,13 @@ public class Customer {
         this.name = name;
         this.email = email;
         this.consent = consent;
+    }
+    
+    @PrePersist
+    protected void onCreate() {
+        if (this.qrToken == null || this.qrToken.isEmpty()) {
+            this.qrToken = java.util.UUID.randomUUID().toString();
+        }
     }
 
     public Long getId() {
@@ -71,5 +87,13 @@ public class Customer {
 
     public void setConsent(boolean consent) {
         this.consent = consent;
+    }
+    
+    public String getQrToken() {
+        return qrToken;
+    }
+
+    public void setQrToken(String qrToken) {
+        this.qrToken = qrToken;
     }
 }

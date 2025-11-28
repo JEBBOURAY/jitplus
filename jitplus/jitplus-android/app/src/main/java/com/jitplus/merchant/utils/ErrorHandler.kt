@@ -1,31 +1,33 @@
 package com.jitplus.merchant.utils
 
+import android.content.Context
 import android.util.Log
+import com.jitplus.merchant.R
 
 object ErrorHandler {
     
-    fun getHttpErrorMessage(code: Int): String {
+    fun getHttpErrorMessage(context: Context, code: Int): String {
         return when (code) {
-            400 -> "Requête invalide. Vérifiez les données saisies"
-            401 -> "Email ou mot de passe incorrect"
-            403 -> "Accès interdit"
-            404 -> "Service non disponible"
-            408 -> "Délai d'attente dépassé"
-            409 -> "Conflit - Ces données existent déjà"
-            422 -> "Données invalides"
-            429 -> "Trop de tentatives. Réessayez plus tard"
-            in 500..599 -> "Erreur serveur. Réessayez plus tard"
-            else -> "Erreur de connexion (code: $code)"
+            400 -> context.getString(R.string.error_bad_request)
+            401 -> context.getString(R.string.error_unauthorized)
+            403 -> context.getString(R.string.error_forbidden)
+            404 -> context.getString(R.string.error_not_found)
+            408 -> context.getString(R.string.error_timeout)
+            409 -> context.getString(R.string.error_conflict)
+            422 -> context.getString(R.string.error_unprocessable)
+            429 -> context.getString(R.string.error_too_many_requests)
+            in 500..599 -> context.getString(R.string.error_server)
+            else -> context.getString(R.string.error_connection_code, code)
         }
     }
     
-    fun getNetworkErrorMessage(throwable: Throwable): String {
+    fun getNetworkErrorMessage(context: Context, throwable: Throwable): String {
         return when (throwable) {
-            is java.net.ConnectException -> "Impossible de se connecter au serveur. Vérifiez que le backend est démarré"
-            is java.net.SocketTimeoutException -> "Délai d'attente dépassé. Vérifiez votre connexion"
-            is java.net.UnknownHostException -> "Serveur introuvable. Vérifiez votre connexion Internet"
-            is javax.net.ssl.SSLException -> "Erreur de sécurité SSL"
-            else -> "Erreur réseau: ${throwable.localizedMessage ?: "Inconnue"}"
+            is java.net.ConnectException -> context.getString(R.string.net_error_connect)
+            is java.net.SocketTimeoutException -> context.getString(R.string.net_error_timeout)
+            is java.net.UnknownHostException -> context.getString(R.string.net_error_unknown_host)
+            is javax.net.ssl.SSLException -> context.getString(R.string.net_error_ssl)
+            else -> context.getString(R.string.net_error_generic, throwable.localizedMessage ?: "Inconnue")
         }
     }
     

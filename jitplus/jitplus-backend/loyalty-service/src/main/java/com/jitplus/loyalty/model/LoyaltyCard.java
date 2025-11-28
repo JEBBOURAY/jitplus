@@ -1,6 +1,11 @@
 package com.jitplus.loyalty.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "loyalty_cards")
@@ -15,18 +20,26 @@ public class LoyaltyCard {
 
     @Column(nullable = false)
     private Long customerId;
+    
+    private String customerName;
+    private String customerPhone;
 
     private int currentPoints; // or stamps
     private int currentStamps;
+    private int redemptionCount = 0; // Track total rewards redeemed
+    private int totalVisits = 0; // Track total visits for loyalty ranking
 
     public LoyaltyCard() {
     }
 
-    public LoyaltyCard(String merchantId, Long customerId) {
+    public LoyaltyCard(String merchantId, Long customerId, String customerName, String customerPhone) {
         this.merchantId = merchantId;
         this.customerId = customerId;
+        this.customerName = customerName;
+        this.customerPhone = customerPhone;
         this.currentPoints = 0;
         this.currentStamps = 0;
+        this.totalVisits = 0;
     }
 
     public Long getId() {
@@ -67,5 +80,37 @@ public class LoyaltyCard {
 
     public void setCurrentStamps(int currentStamps) {
         this.currentStamps = currentStamps;
+    }
+    
+    public int getRedemptionCount() {
+        return redemptionCount;
+    }
+
+    public void setRedemptionCount(int redemptionCount) {
+        this.redemptionCount = redemptionCount;
+    }
+    
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+
+    public String getCustomerPhone() {
+        return customerPhone;
+    }
+
+    public void setCustomerPhone(String customerPhone) {
+        this.customerPhone = customerPhone;
+    }
+
+    public int getTotalVisits() {
+        return totalVisits;
+    }
+
+    public void setTotalVisits(int totalVisits) {
+        this.totalVisits = totalVisits;
     }
 }

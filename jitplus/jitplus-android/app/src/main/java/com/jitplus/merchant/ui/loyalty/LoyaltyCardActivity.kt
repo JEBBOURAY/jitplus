@@ -2,139 +2,118 @@ package com.jitplus.merchant.ui.loyalty
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Button
-import android.widget.ProgressBar
-import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.jitplus.merchant.R
-import com.jitplus.merchant.api.ApiClient
-import com.jitplus.merchant.api.services.LoyaltyService
 import com.jitplus.merchant.data.model.LoyaltyCard
 import com.jitplus.merchant.data.model.LoyaltyProgram
 import com.jitplus.merchant.data.model.RedemptionRequest
 import com.jitplus.merchant.data.model.VisitRequest
-import com.jitplus.merchant.data.model.VisitResponse
-import com.jitplus.merchant.utils.ErrorHandler
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.jitplus.merchant.databinding.ActivityLoyaltyCardBinding
 
 class LoyaltyCardActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityLoyaltyCardBinding
+    private val viewModel: LoyaltyViewModel by viewModels()
+    
     private var customerId: Long = -1
     private var merchantId: String? = null
     private var currentProgram: LoyaltyProgram? = null
     private var currentCard: LoyaltyCard? = null
-
-    private lateinit var tvProgramName: TextView
-    private lateinit var tvProgress: TextView
-    private lateinit var tvRewardStatus: TextView
-    private lateinit var btnAddVisit: Button
-    private lateinit var btnRedeem: Button
-    private lateinit var progressBar: ProgressBar
-    
-    private var programCall: Call<LoyaltyProgram>? = null
-    private var cardCall: Call<LoyaltyCard>? = null
-    private var visitCall: Call<VisitResponse>? = null
-    private var redeemCall: Call<LoyaltyCard>? = null
+    private var customerPhoneNumber: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_loyalty_card)
+        binding = ActivityLoyaltyCardBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         customerId = intent.getLongExtra("CUSTOMER_ID", -1)
         merchantId = intent.getStringExtra("MERCHANT_ID")
+        customerPhoneNumber = intent.getStringExtra("PHONE_NUMBER")
 
         if (customerId == -1L || merchantId == null) {
-            Toast.makeText(this, "Erreur: données client manquantes", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.error_missing_customer_data), Toast.LENGTH_SHORT).show()
             finish()
             return
         }
 
-        tvProgramName = findViewById(R.id.tv_program_name)
-        tvProgress = findViewById(R.id.tv_progress)
-        tvRewardStatus = findViewById(R.id.tv_reward_status)
-        btnAddVisit = findViewById(R.id.btn_add_visit)
-        btnRedeem = findViewById(R.id.btn_redeem_reward)
-        progressBar = findViewById(R.id.progress_bar)
+        setupObservers()
+        loadData()
 
-        val loyaltyService = ApiClient.getClient(this).create(LoyaltyService::class.java)
-
-        loadData(loyaltyService)
-
-        btnAddVisit.setOnClickListener {
-            addVisit(loyaltyService)
+        binding.btnAddVisit.setOnClickListener {
+            addVisit()
+        }
+        
+        binding.btnShowQr.setOnClickListener {
+            showQRCode()
         }
 
-        btnRedeem.setOnClickListener {
-            redeemReward(loyaltyService)
+        binding.btnRedeemReward.setOnClickListener {
+            redeemReward()
         }
     }
 
-    private fun loadData(loyaltyService: LoyaltyService) {
-        showLoading(true)
-        
-        // 1. Load Program
-        programCall = loyaltyService.getProgram(merchantId!!)
-        programCall?.enqueue(object : Callback<LoyaltyProgram> {
-            override fun onResponse(call: Call<LoyaltyProgram>, response: Response<LoyaltyProgram>) {
-                if (isDestroyed || isFinishing) return
-                
-                when {
-                    response.isSuccessful && response.body() != null -> {
-                        currentProgram = response.body()
-                        tvProgramName.text = "Programme: ${currentProgram?.name}"
-                        updateUI()
-                        showLoading(false)
-                    }
-                    else -> {
-                        showLoading(false)
-                        val errorMsg = ErrorHandler.getHttpErrorMessage(response.code())
-                        ErrorHandler.logError("LoyaltyCardActivity", "Program load failed: ${response.code()}")
-                        showError("Erreur chargement programme: $errorMsg")
-                    }
-                }
-            }
-            
-            override fun onFailure(call: Call<LoyaltyProgram>, t: Throwable) {
-                if (isDestroyed || isFinishing) return
-                
-                showLoading(false)
-                val errorMsg = ErrorHandler.getNetworkErrorMessage(t)
-                ErrorHandler.logError("LoyaltyCardActivity", "Network error loading program", t)
-                showError(errorMsg)
-            }
-        })
+    private fun setupObservers() {
+        viewModel.isLoading.observe(this) { isLoading ->
+            showLoading(isLoading)
+        }
 
-        // 2. Load Card
-        cardCall = loyaltyService.getCard(merchantId!!, customerId)
-        cardCall?.enqueue(object : Callback<LoyaltyCard> {
-            override fun onResponse(call: Call<LoyaltyCard>, response: Response<LoyaltyCard>) {
-                if (isDestroyed || isFinishing) return
-                
-                when {
-                    response.isSuccessful && response.body() != null -> {
-                        currentCard = response.body()
-                        updateUI()
-                    }
-                    else -> {
-                        val errorMsg = ErrorHandler.getHttpErrorMessage(response.code())
-                        ErrorHandler.logError("LoyaltyCardActivity", "Card load failed: ${response.code()}")
-                        showError("Erreur chargement carte: $errorMsg")
-                    }
+        viewModel.errorMessage.observe(this) { error ->
+            if (error != null) {
+                showError(error)
+            }
+        }
+
+        viewModel.program.observe(this) { program ->
+            if (program != null) {
+                currentProgram = program
+                binding.tvProgramName.text = getString(R.string.program_label, program.name)
+                updateUI()
+            }
+        }
+
+        viewModel.card.observe(this) { card ->
+            if (card != null) {
+                currentCard = card
+                updateUI()
+            }
+        }
+
+        viewModel.visitResponse.observe(this) { visitResponse ->
+            if (visitResponse != null) {
+                // Update local card state
+                currentCard = currentCard?.copy(
+                    currentStamps = visitResponse.currentStamps,
+                    currentPoints = visitResponse.currentPoints
+                )
+                updateUI()
+
+                if (visitResponse.rewardUnlocked) {
+                    showRewardDialog(visitResponse.rewardDescription)
+                } else {
+                    Toast.makeText(this, getString(R.string.visit_added_success), Toast.LENGTH_SHORT).show()
                 }
+                viewModel.resetVisitResponse()
             }
-            
-            override fun onFailure(call: Call<LoyaltyCard>, t: Throwable) {
-                if (isDestroyed || isFinishing) return
-                
-                val errorMsg = ErrorHandler.getNetworkErrorMessage(t)
-                ErrorHandler.logError("LoyaltyCardActivity", "Network error loading card", t)
-                showError(errorMsg)
+        }
+
+        viewModel.redemptionSuccess.observe(this) { success ->
+            if (success) {
+                AlertDialog.Builder(this)
+                    .setTitle(getString(R.string.reward_redeemed_title))
+                    .setMessage(getString(R.string.reward_redeemed_message))
+                    .setPositiveButton(getString(R.string.ok), null)
+                    .show()
+                viewModel.resetRedemptionSuccess()
             }
-        })
+        }
+    }
+
+    private fun loadData() {
+        viewModel.getProgram(merchantId!!)
+        viewModel.getCard(merchantId!!, customerId)
     }
 
     private fun updateUI() {
@@ -143,120 +122,60 @@ class LoyaltyCardActivity : AppCompatActivity() {
             val current = if (isStamps) currentCard!!.currentStamps else currentCard!!.currentPoints
             val threshold = currentProgram!!.threshold
 
-            tvProgress.text = "$current / $threshold ${if (isStamps) "Tampons" else "Points"}"
+            if (isStamps) {
+                binding.tvProgress.text = getString(R.string.progress_stamps, current, threshold)
+            } else {
+                binding.tvProgress.text = getString(R.string.progress_points, current, threshold)
+            }
 
             if (current >= threshold) {
-                tvRewardStatus.text = "Récompense disponible : ${currentProgram!!.rewardDescription}"
-                btnRedeem.visibility = View.VISIBLE
+                binding.tvRewardStatus.text = getString(R.string.reward_available, currentProgram!!.rewardDescription)
+                binding.btnRedeemReward.visibility = View.VISIBLE
             } else {
-                tvRewardStatus.text = ""
-                btnRedeem.visibility = View.GONE
+                binding.tvRewardStatus.text = ""
+                binding.btnRedeemReward.visibility = View.GONE
             }
         }
     }
 
-    private fun addVisit(loyaltyService: LoyaltyService) {
-        showLoading(true)
-        
+    private fun addVisit() {
         val request = VisitRequest(merchantId!!, customerId, 1)
-        visitCall = loyaltyService.recordVisit(request)
-        visitCall?.enqueue(object : Callback<VisitResponse> {
-            override fun onResponse(call: Call<VisitResponse>, response: Response<VisitResponse>) {
-                if (isDestroyed || isFinishing) return
-                
-                showLoading(false)
-                
-                when {
-                    response.isSuccessful && response.body() != null -> {
-                        val visitResponse = response.body()!!
-                        
-                        // Update local card state
-                        currentCard = currentCard?.copy(
-                            currentStamps = visitResponse.currentStamps,
-                            currentPoints = visitResponse.currentPoints
-                        )
-                        updateUI()
-
-                        if (visitResponse.rewardUnlocked) {
-                            showRewardDialog(visitResponse.rewardDescription)
-                        } else {
-                            Toast.makeText(this@LoyaltyCardActivity, "+1 Ajouté avec succès !", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                    else -> {
-                        val errorMsg = ErrorHandler.getHttpErrorMessage(response.code())
-                        ErrorHandler.logError("LoyaltyCardActivity", "Visit recording failed: ${response.code()}")
-                        showError("Erreur ajout visite: $errorMsg")
-                    }
-                }
-            }
-
-            override fun onFailure(call: Call<VisitResponse>, t: Throwable) {
-                if (isDestroyed || isFinishing) return
-                
-                showLoading(false)
-                val errorMsg = ErrorHandler.getNetworkErrorMessage(t)
-                ErrorHandler.logError("LoyaltyCardActivity", "Network error recording visit", t)
-                showError(errorMsg)
-            }
-        })
+        viewModel.recordVisit(request)
     }
 
-    private fun redeemReward(loyaltyService: LoyaltyService) {
-        showLoading(true)
-        
+    private fun redeemReward() {
         val request = RedemptionRequest(merchantId!!, customerId)
-        redeemCall = loyaltyService.redeemReward(request)
-        redeemCall?.enqueue(object : Callback<LoyaltyCard> {
-            override fun onResponse(call: Call<LoyaltyCard>, response: Response<LoyaltyCard>) {
-                if (isDestroyed || isFinishing) return
-                
-                showLoading(false)
-                
-                when {
-                    response.isSuccessful && response.body() != null -> {
-                        currentCard = response.body()
-                        updateUI()
-                        
-                        AlertDialog.Builder(this@LoyaltyCardActivity)
-                            .setTitle("✅ Récompense utilisée")
-                            .setMessage("La récompense a été validée avec succès. Le solde a été remis à zéro.")
-                            .setPositiveButton("OK", null)
-                            .show()
-                    }
-                    else -> {
-                        val errorMsg = ErrorHandler.getHttpErrorMessage(response.code())
-                        ErrorHandler.logError("LoyaltyCardActivity", "Redemption failed: ${response.code()}")
-                        showError("Erreur utilisation récompense: $errorMsg")
-                    }
-                }
-            }
-
-            override fun onFailure(call: Call<LoyaltyCard>, t: Throwable) {
-                if (isDestroyed || isFinishing) return
-                
-                showLoading(false)
-                val errorMsg = ErrorHandler.getNetworkErrorMessage(t)
-                ErrorHandler.logError("LoyaltyCardActivity", "Network error redeeming reward", t)
-                showError(errorMsg)
-            }
-        })
+        viewModel.redeemReward(request)
     }
 
+    private fun showQRCode() {
+        val phoneToShow = customerPhoneNumber
+        
+        if (phoneToShow != null) {
+            val intent = android.content.Intent(this, com.jitplus.merchant.ui.customer.QRCodeActivity::class.java)
+            intent.putExtra("CUSTOMER_ID", customerId)
+            intent.putExtra("MERCHANT_ID", merchantId)
+            intent.putExtra("PHONE_NUMBER", phoneToShow)
+            startActivity(intent)
+        } else {
+            Toast.makeText(this, getString(R.string.phone_unavailable), Toast.LENGTH_SHORT).show()
+        }
+    }
+    
     private fun showRewardDialog(reward: String) {
         if (isDestroyed || isFinishing) return
         
         AlertDialog.Builder(this)
-            .setTitle("🎉 Félicitations !")
-            .setMessage("Le client a débloqué sa récompense : $reward")
-            .setPositiveButton("OK", null)
+            .setTitle(getString(R.string.congrats_title))
+            .setMessage(getString(R.string.reward_unlocked_message, reward))
+            .setPositiveButton(getString(R.string.ok), null)
             .show()
     }
     
     private fun showLoading(show: Boolean) {
-        progressBar.visibility = if (show) View.VISIBLE else View.GONE
-        btnAddVisit.isEnabled = !show
-        btnRedeem.isEnabled = !show && (currentCard?.let { card ->
+        binding.progressBar.visibility = if (show) View.VISIBLE else View.GONE
+        binding.btnAddVisit.isEnabled = !show
+        binding.btnRedeemReward.isEnabled = !show && (currentCard?.let { card ->
             currentProgram?.let { program ->
                 val current = if (program.type == "STAMPS") card.currentStamps else card.currentPoints
                 current >= program.threshold
@@ -266,13 +185,5 @@ class LoyaltyCardActivity : AppCompatActivity() {
     
     private fun showError(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
-    }
-    
-    override fun onDestroy() {
-        super.onDestroy()
-        programCall?.cancel()
-        cardCall?.cancel()
-        visitCall?.cancel()
-        redeemCall?.cancel()
     }
 }

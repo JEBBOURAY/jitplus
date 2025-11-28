@@ -45,6 +45,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="+1 Passage"
+        android:layout_marginBottom="12dp"/>
+
+    <Button
+        android:id="@+id/btn_show_qr"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="📱 Afficher le QR Code"
+        style="?attr/materialButtonOutlinedStyle"
         android:layout_marginBottom="16dp"/>
 
     <Button

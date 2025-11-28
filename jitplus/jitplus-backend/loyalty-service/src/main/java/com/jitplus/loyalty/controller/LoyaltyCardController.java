@@ -1,11 +1,13 @@
 package com.jitplus.loyalty.controller;
 
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.jitplus.loyalty.model.LoyaltyCard;
-import com.jitplus.loyalty.model.LoyaltyProgram;
 import com.jitplus.loyalty.service.LoyaltyCardService;
-import com.jitplus.loyalty.service.LoyaltyProgramService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/loyalty/cards")
@@ -18,8 +20,11 @@ public class LoyaltyCardController {
     }
 
     @PostMapping
-    public LoyaltyCard createCard(@RequestParam String merchantId, @RequestParam Long customerId) {
-        return cardService.createCardIfNotExists(merchantId, customerId);
+    public LoyaltyCard createCard(@RequestParam String merchantId, 
+                                @RequestParam Long customerId,
+                                @RequestParam(required = false) String customerName,
+                                @RequestParam(required = false) String customerPhone) {
+        return cardService.createCardIfNotExists(merchantId, customerId, customerName, customerPhone);
     }
 
     @GetMapping

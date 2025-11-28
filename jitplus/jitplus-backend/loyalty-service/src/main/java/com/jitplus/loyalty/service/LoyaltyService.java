@@ -1,8 +1,13 @@
 package com.jitplus.loyalty.service;
 
+import java.time.LocalDateTime;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.jitplus.loyalty.dto.RedemptionRequest;
 import com.jitplus.loyalty.dto.VisitRequest;
 import com.jitplus.loyalty.dto.VisitResponse;
-import com.jitplus.loyalty.dto.RedemptionRequest;
 import com.jitplus.loyalty.model.LoyaltyCard;
 import com.jitplus.loyalty.model.LoyaltyProgram;
 import com.jitplus.loyalty.model.ProgramType;
@@ -10,11 +15,6 @@ import com.jitplus.loyalty.model.Visit;
 import com.jitplus.loyalty.repository.LoyaltyCardRepository;
 import com.jitplus.loyalty.repository.LoyaltyProgramRepository;
 import com.jitplus.loyalty.repository.VisitRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
 
 @Service
 public class LoyaltyService {
@@ -53,6 +53,9 @@ public class LoyaltyService {
             pointsToAdd = quantity * program.getPointsPerVisit();
             card.setCurrentPoints(card.getCurrentPoints() + pointsToAdd);
         }
+        
+        // Increment total visits
+        card.setTotalVisits(card.getTotalVisits() + 1);
 
         // 4. Save Card
         cardRepository.save(card);
@@ -97,6 +100,9 @@ public class LoyaltyService {
             }
             card.setCurrentPoints(card.getCurrentPoints() - program.getThreshold());
         }
+        
+        // Increment redemption count
+        card.setRedemptionCount(card.getRedemptionCount() + 1);
 
         // 4. Save and return
         return cardRepository.save(card);
