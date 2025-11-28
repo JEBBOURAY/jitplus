@@ -1,19 +1,21 @@
 package com.jitplus.auth.service;
 
-import com.jitplus.auth.model.MerchantUser;
-import com.jitplus.auth.repository.MerchantRepository;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import com.jitplus.auth.model.MerchantUser;
+import com.jitplus.auth.repository.MerchantRepository;
+
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 
 @Service
 public class AuthService {
@@ -33,6 +35,23 @@ public class AuthService {
         merchant.setPassword(passwordEncoder.encode(merchant.getPassword()));
         repository.save(merchant);
         return "Merchant registered successfully";
+    }
+
+    public String updateStoreInfo(MerchantUser updatedInfo) {
+        MerchantUser existing = repository.findByEmail(updatedInfo.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        existing.setShopName(updatedInfo.getShopName());
+        existing.setShopType(updatedInfo.getShopType());
+        existing.setCity(updatedInfo.getCity());
+        existing.setAddress(updatedInfo.getAddress());
+        existing.setWebsite(updatedInfo.getWebsite());
+        existing.setInstagram(updatedInfo.getInstagram());
+        existing.setLanguage(updatedInfo.getLanguage());
+        existing.setTimezone(updatedInfo.getTimezone());
+        
+        repository.save(existing);
+        return "Store info updated successfully";
     }
 
     public String generateToken(String username) {

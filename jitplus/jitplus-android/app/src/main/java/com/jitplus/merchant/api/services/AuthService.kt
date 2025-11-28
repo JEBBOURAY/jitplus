@@ -12,4 +12,7 @@ interface AuthService {
 
     @POST("auth/register")
     suspend fun register(@Body request: RegisterRequest): Response<String>
+
+    @retrofit2.http.PUT("auth/update")
+    suspend fun updateStoreInfo(@Body request: com.jitplus.merchant.data.model.StoreInfoRequest): Response<String>
 }

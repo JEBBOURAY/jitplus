@@ -95,6 +95,10 @@ class ConfigureProgramActivity : AppCompatActivity() {
         viewModel.programCreated.observe(this) { created ->
             if (created) {
                 Toast.makeText(this, getString(R.string.program_saved_success), Toast.LENGTH_SHORT).show()
+                // Navigate to Dashboard
+                val intent = android.content.Intent(this, com.jitplus.merchant.ui.dashboard.DashboardActivity::class.java)
+                intent.flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
                 finish()
             }
         }

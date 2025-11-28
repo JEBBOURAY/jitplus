@@ -23,6 +23,9 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     private val _registerSuccess = MutableLiveData<Boolean>()
     val registerSuccess: LiveData<Boolean> = _registerSuccess
 
+    private val _updateStoreSuccess = MutableLiveData<Boolean>()
+    val updateStoreSuccess: LiveData<Boolean> = _updateStoreSuccess
+
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
 
@@ -58,6 +61,24 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                 _isLoading.value = false
                 if (response.isSuccessful) {
                     _registerSuccess.value = true
+                } else {
+                    _errorMessage.value = ErrorHandler.getHttpErrorMessage(getApplication(), response.code())
+                }
+            } catch (e: Exception) {
+                _isLoading.value = false
+                _errorMessage.value = ErrorHandler.getNetworkErrorMessage(getApplication(), e)
+            }
+        }
+    }
+
+    fun updateStoreInfo(request: com.jitplus.merchant.data.model.StoreInfoRequest) {
+        _isLoading.value = true
+        viewModelScope.launch {
+            try {
+                val response = repository.updateStoreInfo(request)
+                _isLoading.value = false
+                if (response.isSuccessful) {
+                    _updateStoreSuccess.value = true
                 } else {
                     _errorMessage.value = ErrorHandler.getHttpErrorMessage(getApplication(), response.code())
                 }

@@ -34,6 +34,10 @@ class MerchantRepository(context: Context) {
         return authService.register(request)
     }
 
+    suspend fun updateStoreInfo(request: com.jitplus.merchant.data.model.StoreInfoRequest): Response<String> {
+        return authService.updateStoreInfo(request)
+    }
+
     // Dashboard
     suspend fun getDashboardStats(merchantId: String): Response<DashboardStats> {
         return dashboardService.getStats(merchantId)

@@ -1,13 +1,21 @@
 package com.jitplus.auth.controller;
 
-import com.jitplus.auth.dto.AuthRequest;
-import com.jitplus.auth.model.MerchantUser;
-import com.jitplus.auth.service.AuthService;
-import jakarta.validation.Valid;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.jitplus.auth.dto.AuthRequest;
+import com.jitplus.auth.model.MerchantUser;
+import com.jitplus.auth.service.AuthService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/auth")
@@ -24,6 +32,11 @@ public class AuthController {
     @PostMapping("/register")
     public String addNewUser(@Valid @RequestBody MerchantUser user) {
         return service.saveMerchant(user);
+    }
+
+    @PutMapping("/update")
+    public String updateStoreInfo(@RequestBody MerchantUser user) {
+        return service.updateStoreInfo(user);
     }
 
     @PostMapping("/token")

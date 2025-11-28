@@ -28,8 +28,9 @@
             android:id="@+id/til_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Email ou Téléphone"
+            android:hint="Email professionnel"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            app:helperText="Nous utiliserons cet e-mail pour sécuriser votre compte et vous contacter si besoin."
             app:layout_constraintTop_toBottomOf="@+id/tv_title"
             android:layout_marginTop="32dp">
 
@@ -47,6 +48,7 @@
             android:hint="Mot de passe"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             app:endIconMode="password_toggle"
+            app:helperText="Minimum 8 caractères, avec lettres et chiffres."
             app:layout_constraintTop_toBottomOf="@+id/til_email"
             android:layout_marginTop="16dp">
 
@@ -58,60 +60,45 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/til_shop_name"
+            android:id="@+id/til_confirm_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Nom de la boutique"
+            android:hint="Confirmer le mot de passe"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            app:endIconMode="password_toggle"
             app:layout_constraintTop_toBottomOf="@+id/til_password"
             android:layout_marginTop="16dp">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/reg_shop_name"
+                android:id="@+id/reg_confirm_password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textPersonName"/>
+                android:inputType="textPassword"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/til_city"
+            android:id="@+id/til_phone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Ville"
+            android:hint="Numéro de téléphone (Optionnel)"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            app:layout_constraintTop_toBottomOf="@+id/til_shop_name"
+            app:layout_constraintTop_toBottomOf="@+id/til_confirm_password"
             android:layout_marginTop="16dp">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/reg_city"
+                android:id="@+id/reg_phone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textPostalAddress"/>
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/til_address"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Adresse (Optionnel)"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            app:layout_constraintTop_toBottomOf="@+id/til_city"
-            android:layout_marginTop="16dp">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/reg_address"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textPostalAddress"/>
+                android:inputType="phone"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <Button
             android:id="@+id/btn_register"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:text="S'inscrire"
+            android:text="Créer mon compte"
             android:textSize="16sp"
-            app:layout_constraintTop_toBottomOf="@+id/til_address"
+            app:layout_constraintTop_toBottomOf="@+id/til_phone"
             android:layout_marginTop="32dp"/>
 
         <ProgressBar

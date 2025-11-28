@@ -8,9 +8,22 @@ data class LoginRequest(
 data class RegisterRequest(
     val email: String,
     val password: String,
+    val phone: String? = null,
+    val shopName: String? = null,
+    val city: String? = null,
+    val address: String? = null
+)
+
+data class StoreInfoRequest(
+    val email: String,
     val shopName: String,
+    val shopType: String,
     val city: String,
-    val address: String
+    val address: String?,
+    val website: String? = null,
+    val instagram: String? = null,
+    val language: String? = "FR",
+    val timezone: String? = null
 )
 
 // The token is returned as a plain string in the current backend implementation

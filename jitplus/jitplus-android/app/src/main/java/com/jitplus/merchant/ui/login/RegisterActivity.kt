@@ -40,7 +40,18 @@ class RegisterActivity : AppCompatActivity() {
 
         viewModel.registerSuccess.observe(this) { success ->
             if (success) {
-                Toast.makeText(this, getString(R.string.register_success), Toast.LENGTH_LONG).show()
+                // Auto login after register
+                val email = binding.regEmail.text.toString().trim()
+                val password = binding.regPassword.text.toString()
+                viewModel.login(com.jitplus.merchant.data.model.LoginRequest(email, password))
+            }
+        }
+
+        viewModel.loginSuccess.observe(this) { success ->
+            if (success) {
+                // Navigate to Store Info
+                val intent = android.content.Intent(this, com.jitplus.merchant.ui.settings.StoreInfoActivity::class.java)
+                startActivity(intent)
                 finish()
             }
         }
@@ -49,12 +60,11 @@ class RegisterActivity : AppCompatActivity() {
     private fun attemptRegister() {
         val email = binding.regEmail.text.toString().trim()
         val password = binding.regPassword.text.toString()
-        val shopName = binding.regShopName.text.toString().trim()
-        val city = binding.regCity.text.toString().trim()
-        val address = binding.regAddress.text.toString().trim()
+        val confirmPassword = binding.regConfirmPassword.text.toString()
+        val phone = binding.regPhone.text.toString().trim()
 
         // Validation
-        if (email.isEmpty() || password.isEmpty() || shopName.isEmpty()) {
+        if (email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
             showError(getString(R.string.fill_required_fields))
             return
         }
@@ -70,12 +80,12 @@ class RegisterActivity : AppCompatActivity() {
             return
         }
 
-        if (!ValidationUtils.isValidShopName(shopName)) {
-            showError(getString(R.string.shop_name_too_short))
+        if (password != confirmPassword) {
+            showError("Les mots de passe ne correspondent pas")
             return
         }
 
-        val request = RegisterRequest(email, password, shopName, city, address)
+        val request = RegisterRequest(email, password, phone)
         viewModel.register(request)
     }
     
@@ -84,9 +94,8 @@ class RegisterActivity : AppCompatActivity() {
         binding.btnRegister.isEnabled = !show
         binding.regEmail.isEnabled = !show
         binding.regPassword.isEnabled = !show
-        binding.regShopName.isEnabled = !show
-        binding.regCity.isEnabled = !show
-        binding.regAddress.isEnabled = !show
+        binding.regConfirmPassword.isEnabled = !show
+        binding.regPhone.isEnabled = !show
     }
     
     private fun showError(message: String) {
